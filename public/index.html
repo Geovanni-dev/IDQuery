@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>IDQuery - Consulta na blacklist de ID's de mlbb</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes bounceArrow {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(8px);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        .arrow-bounce {
+            animation: bounceArrow 1.2s infinite ease-in-out;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+       .drop-shadow-custom {
+    filter: drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.9));
+}
+        @media (max-width: 640px) {
+            .bg-clip-mobile {
+                clip-path: polygon(0 0, 100% 0, 100% 35%, 0 70%) !important;
+            }
+            .drop-shadow-custom {
+                filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.9));
+            }
+        }
+        .search-form {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+        .search-form.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .arrow-container {
+            margin-top: 0.5rem;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+        .arrow-container.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media (max-width: 640px) {
+            .arrow-container {
+                margin-top: 0.25rem;
+            }
+            main {
+                padding-top: 1rem !important;
+                padding-bottom: 2rem !important;
+            }
+            .text-center {
+                margin-bottom: 0.5rem !important;
+            }
+            .search-form {
+                margin-top: -0.25rem !important;
+            }
+        }
+        .search-form {
+            margin-top: 0 !important;
+        }
+        
+        /* SOLUÇÃO: Ajusta o placeholder e o input no mobile */
+        @media (max-width: 480px) {
+            .search-input {
+                font-size: 0.8rem;
+                padding: 0.7rem 0.5rem;
+                min-width: 0;
+            }
+            .search-input::placeholder {
+                font-size: 0.7rem;
+            }
+            .search-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.8rem;
+                flex-shrink: 0;
+            }
+            .search-icon {
+                flex-shrink: 0;
+            }
+            .search-icon i {
+                width: 18px;
+                height: 18px;
+            }
+            .pl-3 {
+                padding-left: 0.75rem;
+            }
+        }
+        
+        /* Para telas muito pequenas (360px ou menos) */
+        @media (max-width: 360px) {
+            .search-input::placeholder {
+                font-size: 0.65rem;
+            }
+            .search-input {
+                font-size: 0.75rem;
+                padding: 0.7rem 0.3rem;
+            }
+            .search-btn {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Estilos para os links do footer */
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .footer-link:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .footer-link svg {
+            width: 14px;
+            height: 14px;
+        }
+        @media (max-width: 480px) {
+            .footer-links {
+                gap: 1rem;
+            }
+            .footer-link {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
+
+    <div class="absolute inset-0 z-0 pointer-events-none drop-shadow-custom">
+        <div class="w-full h-full bg-slate-950 bg-clip-mobile" style="clip-path: polygon(0 0, 100% 0, 100% 15%, 0 100%);"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col flex-1 min-h-screen">
+        
+        <nav class="w-full px-4 sm:px-6 py-4 sm:py-6 flex justify-between items-center text-white">
+            <div class="flex items-center gap-2">
+                <i data-lucide="shield-check" class="text-red-500" width="24" height="24"></i>
+                <span class="font-bold text-base sm:text-xl tracking-wider">IDQUERY <span class="text-red-500">BLACKLIST</span></span>
+            </div>
+        </nav>
+
+        <main class="flex-1 flex flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8 md:py-12">
+            
+            <div class="text-center max-w-2xl mx-auto mb-6 sm:mb-6 text-white px-2">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 sm:mb-4 drop-shadow-md">
+                    IDQuery Blacklist
+                </h1>
+                <p class="text-base sm:text-lg md:text-xl text-slate-300 drop-shadow-sm px-2">
+                    Consulte nossa base de dados e verifique se o ID da conta de Mobile Legends possui histórico de roubo ou fraude.
+                </p>
+            </div>
+
+            <div id="arrowContainer" class="arrow-container">
+                <i data-lucide="chevron-down" class="text-white arrow-bounce" width="32" height="32" stroke-width="2"></i>
+            </div>
+
+            <form id="searchForm" class="search-form w-full max-w-lg bg-white rounded-full shadow-2xl border border-slate-200 p-1 sm:p-2">
+                <div class="pl-3 sm:pl-4 text-slate-400 search-icon">
+                    <i data-lucide="search" width="20" height="20"></i>
+                </div>
+                <input type="text" 
+                       id="searchQuery"
+                       placeholder="Ex: 9843843 (1234)"
+                       class="search-input flex-1 bg-transparent border-none outline-none px-2 sm:px-4 py-2 sm:py-3 text-slate-800 text-base sm:text-lg placeholder:text-slate-400">
+                <button type="submit" 
+                        id="searchBtn"
+                        class="search-btn bg-red-600 hover:bg-red-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-8 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-2 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap">
+                    <span id="btnText">Consultar</span>
+                    <i data-lucide="chevron-right" width="16" height="16" class="sm:w-4 sm:h-4"></i>
+                </button>
+            </form>
+
+            <div id="resultArea" class="w-full max-w-lg min-h-[120px] mt-6 sm:mt-8 px-2"></div>
+        </main>
+
+        <footer class="w-full px-4 py-4 sm:py-6 text-center text-slate-500 text-xs sm:text-sm mt-auto">
+            <p>© <span id="currentYear"></span> IDQuery blacklist desenvolvido por Geovani Rodrigues.</p>
+            <p class="mt-1">Este site não possui afiliação oficial com a Moonton.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/Geovanni-dev" target="_blank" class="footer-link">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/geovani-rodrigues-dev/" target="_blank" class="footer-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.771-.773 1.771-1.729V1.729C24 .774 23.208 0 22.225 0z"/>
+                    </svg>
+                    LinkedIn
+                </a>
+                <a href="https://wa.me/5562984585485" target="_blank" class="footer-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.51 3.45 1.47 4.92L2 22l5.35-1.43c1.43.86 3.07 1.32 4.76 1.32 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.12c-1.49 0-2.95-.4-4.21-1.16l-.3-.18-3.18.85.85-3.09-.19-.31c-.82-1.32-1.25-2.83-1.25-4.37 0-4.56 3.71-8.27 8.27-8.27 4.56 0 8.27 3.71 8.27 8.27s-3.71 8.28-8.27 8.28zm4.53-6.19c-.25-.13-1.47-.73-1.7-.81-.23-.08-.39-.13-.56.13s-.64.81-.78.97c-.14.16-.28.18-.53.05-.25-.13-1.05-.39-2-1.24-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.39.11-.52.11-.11.25-.29.38-.44.13-.15.17-.25.26-.42.09-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.67.32-.23.26-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.71 4.3 3.8 2.53 1.09 2.53.73 2.99.68.46-.05 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.11-.21-.18-.46-.31z"/>
+                    </svg>
+                    WhatsApp
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3333/ids';
+        
+        lucide.createIcons();
+
+        const arrowContainer = document.getElementById('arrowContainer');
+        const searchForm = document.getElementById('searchForm');
+        const input = document.getElementById('searchQuery');
+        const searchBtn = document.getElementById('searchBtn');
+        const btnTextSpan = document.getElementById('btnText');
+        const resultArea = document.getElementById('resultArea');
+        document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+        function revealSearch() {
+            if (searchForm.classList.contains('revealed')) return;
+            searchForm.classList.add('revealed');
+            arrowContainer.classList.add('hide');
+        }
+
+        document.body.addEventListener('click', function(e) {
+            if (searchForm.classList.contains('revealed')) return;
+            revealSearch();
+        });
+
+        arrowContainer.addEventListener('click', function(e) {
+            e.stopPropagation();
+            revealSearch();
+        });
+
+        async function consultarApi(query) {
+            const idParam = encodeURIComponent(query.trim());
+            const url = `${API_BASE_URL}/${idParam}`;
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    return { encontrado: false, mensagem: "Tudo limpo! Este ID não consta em nossa blacklist no momento." };
+                }
+                throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            if (data && data.id) {
+                return {
+                    encontrado: true,
+                    mensagem: "ALERTA: Este ID encontra-se em nossa base de dados de contas recuperadas/roubadas. Não realize negociações."
+                };
+            }
+            
+            return { encontrado: false, mensagem: "Tudo limpo! Este ID não consta em nossa blacklist no momento." };
+        }
+
+        function renderResult(result) {
+            const isBlack = result.encontrado;
+            const bgColor = isBlack ? 'bg-red-50 border-red-600' : 'bg-emerald-50 border-emerald-500';
+            const textColor = isBlack ? 'text-red-900' : 'text-emerald-900';
+            const iconBg = isBlack ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
+            const lucideIcon = isBlack ? 'shield-alert' : 'shield-check';
+            const title = isBlack ? 'Conta na Blacklist!' : 'Nenhum registro encontrado';
+            
+            const html = `
+                <div class="animate-fade-in-up p-5 sm:p-6 rounded-2xl shadow-xl border-l-8 ${bgColor} ${textColor}">
+                    <div class="flex items-start gap-3 sm:gap-4">
+                        <div class="p-2 sm:p-3 rounded-full ${iconBg}">
+                            <i data-lucide="${lucideIcon}" width="28" height="28"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg sm:text-xl mb-1 ${isBlack ? 'text-red-700' : 'text-emerald-700'}">
+                                ${title}
+                            </h3>
+                            <p class="opacity-90 leading-relaxed font-medium text-sm sm:text-base">
+                                ${result.mensagem}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultArea.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        async function handleSearch(e) {
+            e.preventDefault();
+            const query = input.value.trim();
+            if (!query) return;
+
+            resultArea.innerHTML = '';
+            searchBtn.disabled = true;
+            btnTextSpan.innerText = 'Buscando...';
+            const chevronIcon = searchBtn.querySelector('[data-lucide="chevron-right"]');
+            if (chevronIcon) chevronIcon.style.display = 'none';
+
+            try {
+                const result = await consultarApi(query);
+                renderResult(result);
+            } catch (error) {
+                console.error('Erro na consulta:', error);
+                resultArea.innerHTML = `<div class="bg-red-100 border-l-8 border-red-600 p-6 rounded-2xl text-red-800">Erro na consulta. Tente novamente.</div>`;
+            } finally {
+                searchBtn.disabled = false;
+                btnTextSpan.innerText = 'Consultar';
+                if (chevronIcon) chevronIcon.style.display = 'inline-flex';
+            }
+        }
+
+        searchForm.addEventListener('submit', handleSearch);
+        searchBtn.addEventListener('click', handleSearch);
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleSearch(e);
+        });
+    </script>
+</body>
+</html>
