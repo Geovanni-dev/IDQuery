@@ -8,13 +8,13 @@ import { z } from "zod";
 const addIdSchema = z.object({
     id: z.string().trim().regex(/^[0-9]+$/, "O ID deve conter apenas números").min(4, "id deve ter no minimo 4 caracteres"),
 
-    server: z.coerce.number().int(). 
-    min(1000, "server deve ter no minimo 4 numeros").
-    max(9999, "server deve ter no maximo 4 numeros").
-    optional() // Converte para número e valida se é um inteiro de 4 dígitos
+    server: z.coerce.number().int()
+    .min(1000, "server deve ter no minimo 4 numeros")
+    .max(9999, "server deve ter no maximo 4 numeros")
+    .optional() // Converte para número e valida se é um inteiro de 4 dígitos
 });
 
-//schema para buscar um id
+//schema para buscar/deletar um id
 const searchIdSchema = z.object({
     id: z.string().trim().min(4, "id deve ter no minimo 4 caracteres").transform((val) => {
         const idClear = val.match(/\d+/); // Extrai a primeira sequência numérica dentro do id e ignora formatos como 74694823 (1278)
@@ -26,6 +26,17 @@ const searchIdSchema = z.object({
         return val;// Retorna a string original caso não possua dígitos, forçando o Zod a falhar
     })
 });
+
+//schema para add ids em massa
+const idsSchema = z.array(z.object({
+    id: z.string().trim().regex(/^[0-9]+$/, "O ID deve conter apenas números").min(4, "id deve ter no minimo 4 caracteres"), 
+    
+    server: z.coerce.number().int()
+    .min(1000, "server deve ter no minimo 4 numeros")
+    .max(9999, "server deve ter no maximo 4 numeros")
+    .optional() // Converte para número e valida se é um inteiro de 4 dígitos
+    }))
+
 
 //========== classe para controlar as rotas
 class IdController { 
@@ -113,6 +124,41 @@ class IdController {
             return res.status(500).json({ error: "Erro ao deletar id" });
         }
     }
+
+
+//================funçao pra add Ids em massa
+    async storeIds (req:Request, res:Response) { 
+        try {
+          const idList = idsSchema.parse(req.body); // parse para verificar se os ids são validos
+          const idSearch = await prisma.id.findMany({ // busca os ids no banco de dados
+            where:  { // verifica se os ids ja existem
+                    id: {
+                        in: idList.map(entry => entry.id)
+                }
+            }
+          });
+          if(idSearch.length > 0) { // se existirem ids cadastrados retorna um erro
+            const idsCadastrados = idSearch.map((id) => id.id).join(", "); // variavel que gera uma string com os ids cadastrados   
+              return res.status(400).json({ error: `Os seguintes ids ja foram cadastrados: ${idsCadastrados}` });
+          }
+          const newIds = await prisma.id.createMany({ // add os ids no banco de dados
+              data: idList.map((entry) => ({
+                  id: entry.id, // pega o id
+                  server: entry.server ?? null // se n for adicionando server, cria um id sem server    
+              }))
+          })
+          return res.json(newIds); // retorna os ids criados
+        } catch (error) { // tratamento de erros
+            if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: "Erro de validação", 
+            detalhes: error.format() // funçao para imprimir os erros de validação em array
+            });
+            }
+            console.log(error); // se n for do zod
+            return res.status(500).json({ error: "Erro ao criar ids" });
+        }
+    }
+
     
     /*  - Pensei em fazer um PUT, mas como o ID é chave primária, o Prisma ia reclamar.
         - Regra de negócio: se cadastrar o ID errado, deleta e cria de novo no painel.

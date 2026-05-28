@@ -10,6 +10,7 @@ const router = Router(); // criação da rota
 router.get("/:id", rateLimitMiddleware.middleware(), idController.showId); // rota para buscar o id
 router.post("/add", idController.storeId); // rota para criar o id
 router.delete("/:id", idController.destroyId); // rota para deletar o id
+router.post("/addIds", idController.storeIds); // rota para criar ids em massa
 
 
 export const idRoutes = router;
