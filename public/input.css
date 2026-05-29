@@ -118,7 +118,7 @@ input:-webkit-autofill:active {
 @media (max-width: 480px) {
     .search-input {
         font-size: 0.8rem;
-        padding-top: 0.15rem !important;
+        padding-top: 0.60rem !important;
         padding: 0.7rem 0.5rem;
         min-width: 0;
     }
