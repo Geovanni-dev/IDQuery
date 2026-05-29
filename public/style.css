@@ -1,0 +1,201 @@
+/* animaçao de entrada suave que faz o elemento subir e aparecer */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* animaçao de pulo infinito para a seta indicativa */
+@keyframes bounceArrow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+/* aplica a animaçao de surgimento de forma rapida e fluida */
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* aplica a animaçao de pulo na seta de forma continua */
+.arrow-bounce {
+    animation: bounceArrow 1.2s infinite ease-in-out;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+/* cria uma sombra customizada e bem forte para destacar elementos */
+.drop-shadow-custom {
+    filter: drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.9));
+}
+
+/* adaptaçao visual do recorte de fundo para telas de celulares */
+@media (max-width: 640px) {
+    .bg-clip-mobile {
+        clip-path: polygon(0 0, 100% 0, 100% 35%, 0 70%) !important;
+    }
+    .drop-shadow-custom {
+        filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.9));
+    }
+}
+
+/* configuraçao inicial do formulario oculto e movido para baixo */
+.search-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+/* classe ativada via javascript para exibir o formulario na tela */
+.search-form.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* estilizacao do container da seta com transiçao suave de opacidade */
+.arrow-container {
+    margin-top: 0.5rem;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+/* oculta a seta de indicacao quando o formulario e ativado */
+.arrow-container.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ajustes de margem e espaçamento geral para dispositivos moveis */
+@media (max-width: 640px) {
+    .arrow-container {
+        margin-top: 0.25rem;
+    }
+    main {
+        padding-top: 1rem !important;
+        padding-bottom: 2rem !important;
+    }
+    .text-center {
+        margin-bottom: 0.5rem !important;
+    }
+    .search-form {
+        margin-top: -0.25rem !important;
+    }
+}
+
+/* remove margem superior forçada do formulario */
+.search-form {
+    margin-top: 0 !important;
+}
+
+/* remove aquele fundo solido padrao do preenchimento automatico dos navegadores */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    box-shadow: 0 0 0 30px white inset !important;
+    background-color: transparent !important;
+    background-clip: content-box !important;
+}
+
+/* encolhe os elementos do formulario para caber em telas bem pequenas */
+@media (max-width: 480px) {
+    .search-input {
+        font-size: 0.8rem;
+        padding-top: 0.15rem !important;
+        padding: 0.7rem 0.5rem;
+        min-width: 0;
+    }
+    .search-input::placeholder {
+        font-size: 0.7rem;
+    }
+    .search-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    .search-icon {
+        flex-shrink: 0;
+    }
+    .search-icon i {
+        width: 18px;
+        height: 18px;
+    }
+    .pl-3 {
+        padding-left: 0.75rem;
+    }
+}
+
+/* refinamento extra para telas extremamente estreitas */
+@media (max-width: 360px) {
+    .search-input::placeholder {
+        font-size: 0.65rem;
+    }
+    .search-input {
+        padding-top: 0.15rem !important;
+        font-size: 0.75rem;
+        padding: 0.7rem 0.3rem;
+    }
+    .search-btn {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* organiza a area dos links de contato centralizados e com quebra de linha automatica */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+/* estilizacao padrao de cada botao do rodape com bordas arredondadas */
+.footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+/* efeito visual com destaque em vermelho ao passar o mouse por cima do link */
+.footer-link:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* ajusta o tamanho padrao dos icones dentro dos links */
+.footer-link svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* reduz o espaçamento e a fonte dos links em telas pequenas */
+@media (max-width: 480px) {
+    .footer-links {
+        gap: 1rem;
+    }
+    .footer-link {
+        font-size: 0.7rem;
+    }
+}
