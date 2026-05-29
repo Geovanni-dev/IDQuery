@@ -6,11 +6,17 @@ const router = Router(); // criação da rota
 
 
 //=================== rotas
+// rota para buscar o id
+router.get("/:id", rateLimitMiddleware.middleware(), idController.showId); 
 
-router.get("/:id", rateLimitMiddleware.middleware(), idController.showId); // rota para buscar o id
-router.post("/add", idController.storeId); // rota para criar o id
-router.delete("/:id", idController.destroyId); // rota para deletar o id
-router.post("/addIds", idController.storeIds); // rota para criar ids em massa
+//rota para adicionar o id
+router.post("/add", idController.storeId);
+
+//rota para deletar o id
+router.delete("/:id", idController.destroyId); 
+
+//rota para adicionar ids em massa
+router.post("/bulk", idController.storeIds); 
 
 
 export const idRoutes = router;
