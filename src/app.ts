@@ -16,14 +16,20 @@ class Server {
 
 private middleware(): void {
         this.app.use(express.json()); // configuração do middleware para parsear o corpo das requisições como JSON
-        this.app.use(cors()); // configuração do middleware cors
+        /*this.app.use(cors()); cors para desenvolvimento*/
         this.app.use(cors({
         origin: process.env.CLIENT_URL!.split(",").map((url) => url.trim()),
 }));
+        
     }
 
 private routes(): void { // configuração das rotas
         this.app.use('/ids', idRoutes); 
+        this.app.get("/", (_req, res) => {
+            res.json({
+            message: "Servidor subiu com sucesso",
+        })
+})
     }
     
 };
