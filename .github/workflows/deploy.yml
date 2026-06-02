@@ -1,0 +1,43 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build e Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/id-query-v20-api:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy na VPS
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+            cd ~/id-query-v20-api
+            docker compose down
+            docker compose pull
+            docker compose up -d
+          ENDSSH

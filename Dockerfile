@@ -1,5 +1,5 @@
-# usa uma versao estavel do node baseada em linux alpine para reduzir o tamanho da imagem
-FROM node:22.20.0-alpine
+# stage 1 ---- responsavel por instalar dependencias, gerar o prisma client e compilar o typescript
+FROM node:22.20.0-alpine AS builder
 
 # define o diretorio de trabalho interno do container onde o app vai rodar
 WORKDIR /app
@@ -7,10 +7,10 @@ WORKDIR /app
 # copia os arquivos de mapeamento de dependencias antes do restante do codigo
 COPY package*.json ./
 
-# instala as dependencias de forma isolada dentro do container
+# instala todas as dependências incluindo as de desenvolvimento necessarias para o build
 RUN yarn install
 
-# copia a pasta do prisma primeiro para gerar o client na arquitetura do container
+# copia a pasta do prisma primeiro para gerar o client no container
 COPY prisma ./prisma/
 
 # gera o prisma client especifico para o ambiente linux do docker
@@ -22,8 +22,26 @@ COPY . .
 # compila o codigo typescript e cria a pasta dist
 RUN yarn build
 
-# expoe a porta interna que a api vai utilizar para receber requisicoes
+# stage 2 - responsavel por montar a imagem final de producao apenas com o necessario para rodar
+FROM node:22.20.0-alpine
+
+# define o diretorio de trabalho interno do container onde o app vai rodar
+WORKDIR /app
+
+# copia os arquivos de mapeamento de dependencias antes do restante do codigo
+COPY package*.json ./
+
+# instala apenas as dependencias de producao ignorando as de desenvolvimento
+RUN yarn install --production
+
+# copia apenas o codigo compilado gerado no stage de build
+COPY --from=builder /app/dist ./dist
+
+# copia o prisma client gerado para a arquitetura linux no stage de build
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# expoe a porta interna que a api vai utilizar para receber requisições
 EXPOSE 3333
 
-# executa o servidor com node puro para maxima performance em producao
+# executa o servidor com node puro para max performance em produçao
 CMD ["yarn", "start"]
