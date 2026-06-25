@@ -19,6 +19,7 @@ Para respeitar a confidencialidade e a interface do cliente original, **separei 
 ## 🛠️ Tecnologias Utilizadas
 
 **Back-end & Infraestrutura:**
+
 - **Node.js + TypeScript** — Base sólida, tipada e escalável
 - **Express** — Roteamento e middlewares da API
 - **Prisma ORM** — Modelagem de dados e queries tipadas
@@ -27,6 +28,7 @@ Para respeitar a confidencialidade e a interface do cliente original, **separei 
 - **GitHub Actions** — Pipeline de CI/CD para build e deploy automatizados
 
 **Front-end:**
+
 - HTML5, Tailwind CSS, JavaScript Vanilla
 - Servido estaticamente direto pelo backend (`express.static`)
 
@@ -72,12 +74,12 @@ Para respeitar a confidencialidade e a interface do cliente original, **separei 
 
 ## 📍 Endpoints da API
 
-| Método | Rota | Descrição |
-|:-------|:-----|:----------|
-| `GET` | `/ids/:id` | Consulta se um ID específico está na base (Protegido por Rate Limit) |
-| `POST` | `/ids/add` | Registra um novo ID no sistema |
-| `POST` | `/ids/bulk` | Registra múltiplos IDs de uma vez (Carga em massa) |
-| `DELETE` | `/ids/:id` | Remove um ID do banco de dados |
+| Método   | Rota        | Descrição                                                            |
+| :------- | :---------- | :------------------------------------------------------------------- |
+| `GET`    | `/ids/:id`  | Consulta se um ID específico está na base (Protegido por Rate Limit) |
+| `POST`   | `/ids/add`  | Registra um novo ID no sistema                                       |
+| `POST`   | `/ids/bulk` | Registra múltiplos IDs de uma vez (Carga em massa)                   |
+| `DELETE` | `/ids/:id`  | Remove um ID do banco de dados                                       |
 
 > 🔒 **Nota sobre Gerenciamento (Admin):** O front-end de administração desta aplicação é estritamente privado. Para testar o cadastro (`POST`) ou a exclusão (`DELETE`) de IDs localmente, utilize um client HTTP como **Postman**, **Insomnia** ou **Bruno**.
 
@@ -94,13 +96,13 @@ O projeto utiliza **GitHub Actions** para automatizar o processo de build e depl
 
 ### Secrets necessários no repositório
 
-| Secret | Descrição |
-|--------|-----------|
-| `DOCKERHUB_USERNAME` | Seu usuário no Docker Hub |
-| `DOCKERHUB_TOKEN` | Token de acesso do Docker Hub |
-| `SSH_HOST` | IP público da VPS |
-| `SSH_USER` | Usuário SSH da VPS |
-| `SSH_KEY` | Chave privada SSH completa |
+| Secret               | Descrição                     |
+| -------------------- | ----------------------------- |
+| `DOCKERHUB_USERNAME` | Seu usuário no Docker Hub     |
+| `DOCKERHUB_TOKEN`    | Token de acesso do Docker Hub |
+| `SSH_HOST`           | IP público da VPS             |
+| `SSH_USER`           | Usuário SSH da VPS            |
+| `SSH_KEY`            | Chave privada SSH completa    |
 
 ---
 
